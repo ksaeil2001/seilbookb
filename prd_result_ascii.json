@@ -1,0 +1,102 @@
+{
+  "document_description": "ASCII-escaped PRD cleanup result JSON for maximum encoding compatibility across environments.",
+  "checklist": [
+    "Move CR change details out of PRD body",
+    "Keep Database Schema at entity/core-constraint level",
+    "Keep API section at MVP scope and key rules",
+    "Replace ASCII mockups with concise UX requirements",
+    "Move security runbook details to operations docs",
+    "Remove appendix priority mapping from PRD",
+    "Remove operational Next Steps/Contact from PRD"
+  ],
+  "solutions": [
+    {
+      "item": "Move CR change details out of PRD body",
+      "options": [
+        "Keep as-is",
+        "Keep summary only and move details to PR/issue tracker",
+        "Move fully to CHANGELOG"
+      ]
+    },
+    {
+      "item": "Keep Database Schema at entity/core-constraint level",
+      "options": [
+        "Keep implementation detail",
+        "Keep entities/core constraints only",
+        "Delete section"
+      ]
+    },
+    {
+      "item": "Keep API section at MVP scope and key rules",
+      "options": [
+        "Keep full branching detail",
+        "Keep MVP scope/core rules/app_codes only",
+        "Delete section"
+      ]
+    },
+    {
+      "item": "Replace ASCII mockups with concise UX requirements",
+      "options": [
+        "Keep mockups",
+        "Keep screen purpose/key UX summary only",
+        "Delete section"
+      ]
+    },
+    {
+      "item": "Move security runbook details to operations docs",
+      "options": [
+        "Keep all runbook detail in PRD",
+        "Keep security principles/required controls only",
+        "Reduce to one-line policy"
+      ]
+    },
+    {
+      "item": "Remove appendix priority mapping from PRD",
+      "options": [
+        "Keep appendix",
+        "Move to backlog tool and remove",
+        "Keep top 3 only"
+      ]
+    },
+    {
+      "item": "Remove operational Next Steps/Contact from PRD",
+      "options": [
+        "Keep as-is",
+        "Move to operations wiki and remove",
+        "Condense to one metadata line"
+      ]
+    }
+  ],
+  "chosen_solutions": [
+    {
+      "item": "Move CR change details out of PRD body",
+      "chosen": "Keep summary only and move details to PR/issue tracker"
+    },
+    {
+      "item": "Keep Database Schema at entity/core-constraint level",
+      "chosen": "Keep entities/core constraints only"
+    },
+    {
+      "item": "Keep API section at MVP scope and key rules",
+      "chosen": "Keep MVP scope/core rules/app_codes only"
+    },
+    {
+      "item": "Replace ASCII mockups with concise UX requirements",
+      "chosen": "Keep screen purpose/key UX summary only"
+    },
+    {
+      "item": "Move security runbook details to operations docs",
+      "chosen": "Keep security principles/required controls only"
+    },
+    {
+      "item": "Remove appendix priority mapping from PRD",
+      "chosen": "Move to backlog tool and remove"
+    },
+    {
+      "item": "Remove operational Next Steps/Contact from PRD",
+      "chosen": "Move to operations wiki and remove"
+    }
+  ],
+  "revised_document": "# PRD: \ub9cc\ud654/\uc6f9\ud230 AI \ubc88\uc5ed \uc11c\ube44\uc2a4 (MVP v1.0)\n\n- \ucd5c\uc885 \uc5c5\ub370\uc774\ud2b8: 2026-02-07\n- \ubaa9\ud45c \uc644\ub8cc\uc77c: PRD \uc2b9\uc778\uc77c \uae30\uc900 6\uc8fc\n- \uc804\ub7b5: Quick Wins (\uc2e4\uc0ac\uc6a9 \uac00\ub2a5\ud55c \uccab \ubc84\uc804)\n\n---\n\n## \ubb38\uc11c \uc6b4\uc601 \uc6d0\uce59\n\n- PRD\uc5d0\ub294 \ud604\uc7ac \uc720\ud6a8\ud55c \uc81c\ud488 \uc694\uad6c\uc0ac\ud56d\uacfc \uac80\uc99d \uae30\uc900\ub9cc \uc720\uc9c0\ud55c\ub2e4.\n- \uc0c1\uc138 \ubcc0\uacbd \uc774\ub825\uc740 PR/\uc774\uc288 \ud2b8\ub798\ucee4\uc5d0\uc11c \uad00\ub9ac\ud55c\ub2e4.\n- \uad6c\ud604 \uc0c1\uc138(DDL, \uc5d0\ub7ec \ub9e4\ud2b8\ub9ad\uc2a4, \ubcf4\uc548 runbook, \uc6b4\uc601 \uccb4\ud06c\ub9ac\uc2a4\ud2b8)\ub294 \ubcc4\ub3c4 \uc6b4\uc601 \ubb38\uc11c\ub85c \ubd84\ub9ac\ud55c\ub2e4.\n\n---\n\n## Executive Summary\n\n### \uc81c\ud488 \uc815\uccb4\uc131\n\n- \uc81c\ud488 \uc815\uc758: \uc774\ubbf8\uc9c0 \uae30\ubc18 \ub9cc\ud654/\uc6f9\ud230 \ubc88\uc5ed \uacb0\uacfc\ubb3c \uc0dd\uc131 \uc5d4\uc9c4\n- \ud575\uc2ec \uac00\uce58:\n  - \uc2dc\uac04\uc801 \uac00\uce58: \ud398\uc774\uc9c0\ub2f9 \ud3c9\uade0 30\ucd08 \ub0b4 \ucc98\ub9ac\n  - \ubb38\ud559\uc801 \uac00\uce58: \ub808\uc774\uc544\uc6c3/\ub9d0\ud22c/\uc6a9\uc5b4 \uc77c\uad00\uc131\uc744 \uac16\ucd98 \uc77d\uae30 \uacbd\ud5d8\n\n### North Star (12\uac1c\uc6d4)\n\n- \uc0ac\uc6a9\uc790\uac00 \uc77c\uc0c1\uc801\uc73c\ub85c \ub9cc\ud654/\uc6f9\ud230\uc744 \ubc88\uc5ed\ud574 \uc77d\ub294 \ubc18\ubcf5 \uc0ac\uc6a9 \ub3c4\uad6c\ub85c \uc815\ucc29\ud55c\ub2e4.\n\n### \uc131\uacf5 \uc815\uc758 (MVP)\n\n- Hard Gate (\uc790\ub3d9):\n  - \ub204\ub77d \uc5c6\uc74c: input_text_count == output_text_count\n  - \ub808\uc774\uc544\uc6c3 \uc548\uc815: bbox_overflow == 0 and min_font_pt >= 10\n- Soft Gate (\uc0d8\ud50c\ub9c1):\n  - \uc790\uc5f0\uc2a4\ub7ec\uc6c0: \uace8\ub4e0\uc14b \uc218\ub3d9 \ud3c9\uac00 90% \ud1b5\uacfc\n  - \uc815\ud655\ub3c4: \uc624\uc5ed \uccb4\ud06c\ub9ac\uc2a4\ud2b8 5\uac1c \uc911 4\uac1c \ud1b5\uacfc\n- \uc0ac\uc6a9\uc790 Gate (cohort_100):\n  - CSAT \ud3c9\uade0 >= 4.0/5.0\n  - \ubb34\ud3b8\uc9d1 \uc77d\uae30 \ube44\uc728 >= 90%\n\n### \uc0c1\ud0dc \ubaa8\ub378 SSOT\n\n- job_status: pending, processing, completed, failed, canceled\n- page_status: success, partial, fail, canceled\n- terminal_non_canceled_pages: success, partial, fail\n- \uacfc\uae08 \uaddc\uce59: success=1.0, partial=0.5, fail/canceled=0\n\n---\n\n## Problem & Solution\n\n### \ubb38\uc81c\n\n- \uae30\uc874 \ub3c4\uad6c\ub294 \ud488\uc9c8 \ud3b8\ucc28\uac00 \ud06c\uace0 \ub808\uc774\uc544\uc6c3/\uc6a9\uc5b4 \uc77c\uad00\uc131\uc774 \ub0ae\uc544 \ubab0\uc785\uc744 \ud574\uce5c\ub2e4.\n- \uc218\ub3d9 \ubc88\uc5ed\uc740 \uc2dc\uac04 \ube44\uc6a9\uc774 \ub192\ub2e4.\n\n### \uc194\ub8e8\uc158\n\n- OCR + \ubc88\uc5ed + \uc778\ud398\uc778\ud305 + \uc2dd\uc790\ub97c \ub2e8\uc77c \ud30c\uc774\ud504\ub77c\uc778\uc73c\ub85c \uc790\ub3d9\ud654\ud55c\ub2e4.\n- \ud488\uc9c8 \uc6b0\uc120 \uc6d0\uce59\uc744 \uc801\uc6a9\ud574, \uc18d\ub3c4 \ubaa9\ud45c\ubcf4\ub2e4 \uc77d\uae30 \uac00\ub2a5 \ud488\uc9c8\uc744 \uc6b0\uc120\ud55c\ub2e4.\n\n---\n\n## Target Users\n\n- 1\ucc28 \ud0c0\uae43: \ud574\uc678 \ub9cc\ud654/\uc6f9\ud230\uc744 \ube60\ub974\uac8c \uc77d\uace0 \uc2f6\uc740 \uac1c\uc778 \uc0ac\uc6a9\uc790\n- \ucf58\ud150\uce20 \ubc94\uc704: \uc131\uc778 \ub4f1\uae09 \ud3ec\ud568\n- \uc6b4\uc601 \ucc28\ub2e8 \ub300\uc0c1: \uc2e4\uc874 \uc778\ubb3c \ub178\ucd9c/\uac1c\uc778\uc815\ubcf4 \ud3ec\ud568 \uc774\ubbf8\uc9c0\n\n---\n\n## System Architecture\n\n### \ud30c\uc774\ud504\ub77c\uc778\n\n- Preprocess -> Text Detection -> OCR -> Translation -> Inpainting/Typesetting -> Postprocess\n\n### \uae30\uc220 \uc2a4\ud0dd\n\n- Frontend: Next.js + TypeScript\n- Backend: FastAPI + Python\n- Storage/DB: Cloudflare R2 + PostgreSQL\n- Queue: Redis + Worker\n\n### \ub0b4\uacb0\ud568\uc131\n\n- OpenAI \uc7a5\uc560: Gemini fallback\n- OCR \uc2e0\ub8b0\ub3c4 \uc800\ud558: Vision fallback\n- \uc778\ud398\uc778\ud305 \uc2e4\ud328: \uc81c\ud55c\uc801 fallback\n\n---\n\n## Core Features (MVP Scope)\n\n### In Scope\n\n- \ud68c\uc6d0\uac00\uc785/\ub85c\uadf8\uc778/\uc138\uc158 \uc720\uc9c0\n- ZIP \uc5c5\ub85c\ub4dc -> \ubc88\uc5ed -> \ub2e4\uc6b4\ub85c\ub4dc\n- \uc791\uc5c5 \uc9c4\ud589\ub960 \ubc0f \ud398\uc774\uc9c0\ubcc4 \uc0c1\ud0dc \ud655\uc778\n- \uacb0\uacfc \uc778\ub77c\uc778 \ud3b8\uc9d1(\ud5c8\uc6a9 \uc0c1\ud0dc\ub9cc)\n- \uc2e4\ud328 \ud398\uc774\uc9c0 \uc7ac\uc2dc\ub3c4(\uc0c1\ud55c 3\ud68c)\n- \uc2e0\uace0(Report) \uc0dd\uc131 \ubc0f \uad00\ub9ac\uc790 \ucc98\ub9ac\n- \ud06c\ub808\ub527 \ucc28\uac10/\uc6d0\uc7a5 \uae30\ub85d\n\n### Out of Scope\n\n- \uc2e4\uc2dc\uac04 \ud611\uc5c5 \ud3b8\uc9d1\n- \uacf5\uac1c API \uc81c\uacf5\n- \uace0\uae09 \uc2a4\ud0c0\uc77c \ud3b8\uc9d1\uae30\n\n---\n\n## User Flow\n\n1. \uc0ac\uc6a9\uc790\ub294 \ub85c\uadf8\uc778 \ud6c4 \ubc88\uc5ed \ud30c\uc77c\uc744 \uc5c5\ub85c\ub4dc\ud55c\ub2e4.\n2. \uc2dc\uc2a4\ud15c\uc740 \uc791\uc5c5\uc744 \uc0dd\uc131\ud558\uace0 \ud050\uc5d0\uc11c \ud398\uc774\uc9c0 \ub2e8\uc704\ub85c \ucc98\ub9ac\ud55c\ub2e4.\n3. \uc0ac\uc6a9\uc790\ub294 \uc9c4\ud589\ub960/\uc0c1\ud0dc\ub97c \uc870\ud68c\ud55c\ub2e4.\n4. \uc644\ub8cc \ud6c4 \uacb0\uacfc\ubb3c\uc744 \ub2e4\uc6b4\ub85c\ub4dc\ud558\uac70\ub098 \ud544\uc694\ud55c \ud398\uc774\uc9c0\ub97c \ud3b8\uc9d1/\uc7ac\uc2dc\ub3c4\ud55c\ub2e4.\n5. \uc774\uc288\uac00 \uc788\uc73c\uba74 \uc2e0\uace0\ub97c \uc0dd\uc131\ud55c\ub2e4.\n\n---\n\n## Business Model & Constraints\n\n### \ud06c\ub808\ub527\n\n- \uc2e0\uaddc \uc0ac\uc6a9\uc790 \uae30\ubcf8 \ud06c\ub808\ub527 \uc81c\uacf5\n- \ud398\uc774\uc9c0 \uc0c1\ud0dc\ubcc4 \ucc28\uac10 \uaddc\uce59 \uc801\uc6a9\n\n### \uc6b4\uc601 \uc81c\uc57d\n\n- \uc0ac\uc6a9\uc790\ubcc4 \ud65c\uc131 \uc791\uc5c5 1\uac74 \uc81c\ud55c\n- \uc77c\uc77c \ube44\uc6a9 \uc0c1\ud55c \ucd08\uacfc \uc2dc \uc2e0\uaddc \uc791\uc5c5 \ucc28\ub2e8\n- \ud658\uc728 \uc2a4\ub0c5\uc0f7 \ub204\ub77d \uc2dc fail-closed\n\n### \uc131\ub2a5 \ubaa9\ud45c\n\n- \ud3c9\uade0 \ucc98\ub9ac \uc2dc\uac04: < 30\ucd08/\ud398\uc774\uc9c0\n- \ud398\uc774\uc9c0 \ud0c0\uc784\uc544\uc6c3: 120\ucd08\n\n---\n\n## Content Moderation\n\n- \uc5c5\ub85c\ub4dc \uc804 \uacbd\uace0 \ubb38\uad6c \uc81c\uacf5\n- \uacb0\uacfc \ud398\uc774\uc9c0\ub9c8\ub2e4 \uc2e0\uace0 \uae30\ub2a5 \uc81c\uacf5\n- \uc2e0\uace0 \uc0c1\ud0dc: open, reviewing, resolved, rejected\n- \uc911\ubcf5 \uc2e0\uace0 \ubc0f \ucfe8\ub2e4\uc6b4 \uc815\ucc45 \uc801\uc6a9\n\n---\n\n## Quality Assurance\n\n### \ud14c\uc2a4\ud2b8 \uc6d0\uce59\n\n- \uace8\ub4e0\uc14b \ud68c\uadc0 \ud14c\uc2a4\ud2b8\ub97c \ub9b4\ub9ac\uc988 \uac8c\uc774\ud2b8\ub85c \uc0ac\uc6a9\n- KPI \uacc4\uc0b0\uc740 \ucd5c\uc885 terminal \uc0c1\ud0dc \uae30\uc900\uc73c\ub85c \uc9d1\uacc4\n\n### \ucd5c\uc18c \uac8c\uc774\ud2b8\n\n- \uc131\uacf5\ub960 >= 90%\n- \uc0ac\uc6a9 \uac00\ub2a5\ub960 >= 95%\n- \ud68c\uadc0\uc138\ud2b8 \uae30\uc900 \ud488\uc9c8 \uc784\uacc4 \ucda9\uc871\n\n---\n\n## Database Schema (\uc694\uc57d)\n\n### \ud575\uc2ec \uc5d4\ud130\ud2f0\n\n- users: \uacc4\uc815/\uad8c\ud55c/\ud06c\ub808\ub527\n- jobs: \uc791\uc5c5 \ub2e8\uc704 \uc0c1\ud0dc/\uc9c4\ud589\ub960\n- pages: \ud398\uc774\uc9c0 \ub2e8\uc704 \uacb0\uacfc/\uc7ac\uc2dc\ub3c4/\ud3b8\uc9d1\n- idempotency_keys: \uc4f0\uae30 \uc694\uccad \uba71\ub4f1\uc131\n- credit_ledger: \ud06c\ub808\ub527 \uac10\uc0ac \uc6d0\uc7a5\n- api_cost_events: \uc678\ubd80 API \ube44\uc6a9 \uc6d0\uc7a5\n- reports: \uc2e0\uace0 \uc0c1\ud0dc\uba38\uc2e0\n- security_events: \ubcf4\uc548 \uc774\ubca4\ud2b8\n- download_events, cohort_100_members: KPI \uc9d1\uacc4 \uadfc\uac70\n\n### \uc81c\uc57d\n\n- \uc2dc\uac04 \uceec\ub7fc\uc740 UTC TIMESTAMPTZ \uae30\uc900\n- append-only \uc6d0\uc7a5 \uc815\ucc45 \uc720\uc9c0\n- \uc0c1\ud0dc \uc804\uc774\uc640 \uacfc\uae08 \uaddc\uce59\uc740 PRD SSOT\ub97c \ub530\ub978\ub2e4\n\n---\n\n## API Endpoints (\uc694\uc57d)\n\n### \ub3c4\uba54\uc778\n\n- Auth: signup/login/refresh/logout\n- Users: me/csat\n- Jobs: create/list/detail/cancel/download\n- Pages: list/retry/edit/download\n- Reports: create\n- Admin: report review/resolve/reject\n\n### \uacf5\ud1b5 \uaddc\uce59\n\n- \uc4f0\uae30 API\ub294 Idempotency-Key \ud544\uc218(\uc778\uc99d \uc5d4\ub4dc\ud3ec\uc778\ud2b8 \uc608\uc678)\n- \ud45c\uc900 app_code\ub85c \uc624\ub958\ub97c \ubd84\uae30\ud55c\ub2e4\n- \uc815\ucc45 \ucc28\ub2e8\uc740 \uc740\ub2c9 \uc6b0\uc120 \uaddc\uce59\uc744 \uc801\uc6a9\ud55c\ub2e4\n\n### \uc8fc\uc694 app_code\n\n- \uc785\ub825: UNSUPPORTED_FILE_TYPE, MAX_PAGES_EXCEEDED, ARCHIVE_PARSE_FAILED\n- \uc81c\ud55c: TEMPORARILY_BLOCKED, DAILY_PAGE_LIMIT_EXCEEDED, HOURLY_PAGE_LIMIT_EXCEEDED, QUEUE_CAPACITY_EXCEEDED\n- \ube44\uc6a9: COST_DAILY_LIMIT_EXCEEDED, FX_RATE_UNAVAILABLE\n- \uacbd\ud569: ACTIVE_JOB_ALREADY_EXISTS, IDEMPOTENCY_IN_PROGRESS, PAGE_NOT_EDITABLE, PAGE_RETRY_LIMIT_EXCEEDED\n\n---\n\n## Security & Privacy (\uc694\uc57d)\n\n- JWT \uae30\ubc18 \uc778\uc99d + Refresh \ud68c\uc804\n- CSRF/CORS \uae30\ubcf8 \ucc28\ub2e8 \uc815\ucc45\n- RBAC(user/admin) \ucd5c\uc18c\uad8c\ud55c \uc801\uc6a9\n- Rate limiting \ubc0f \uc774\uc0c1\ud589\ub3d9 \uc774\ubca4\ud2b8 \uae30\ub85d\n- \ubbfc\uac10\uc815\ubcf4 \ucd5c\uc18c\uc218\uc9d1, \uc800\uc7a5 \uc554\ud638\ud654, \uc804\uc1a1 TLS \uac15\uc81c\n- override\ub294 2\uc778 \uc2b9\uc778 + \ub9cc\ub8cc\uc2dc\uac04 + \uc0ac\ud6c4\uc870\uce58 \ud544\uc218\n\n---\n\n## Success Metrics\n\n### \uae30\uc220 KPI\n\n- success_rate = success / terminal_non_canceled_pages\n- usable_rate = (success + partial) / terminal_non_canceled_pages\n- no_edit_rate = count(edited=false and page_status=success) / count(page_status=success)\n- fallback_rate = fallback_pages / terminal_non_canceled_pages\n- cost_per_page = total_external_api_cost_krw / terminal_non_canceled_pages\n\n### \uc6b4\uc601 KPI\n\n- DAU/MAU\n- \ud06c\ub808\ub527 \uc18c\uc9c4\uc728\n- \uc720\ub8cc \uc804\ud658\uc728(\uad00\ucc30 \uc9c0\ud45c)\n\n---\n\n## Risk Mitigation\n\n- API \uc7a5\uc560: circuit breaker + fallback\n- \ube44\uc6a9 \ud3ed\uc8fc: \uc77c\uc77c \uc0c1\ud55c/\ucc28\ub2e8/\uacbd\ubcf4\n- \uacfc\ubd80\ud558: \ud050 \ubaa8\ub2c8\ud130\ub9c1 + \ub3d9\uc2dc\uc131 \uc81c\uc5b4\n- \uc815\ucc45 \uc704\ubc18: \uc2e0\uace0/\uac80\ud1a0/\ucc28\ub2e8 \ud504\ub85c\uc138\uc2a4\n\n---\n\n## Definition of Done (MVP)\n\n### \uae30\ub2a5\n\n- E2E \uc5c5\ub85c\ub4dc -> \ubc88\uc5ed -> \ub2e4\uc6b4\ub85c\ub4dc \ub3d9\uc791\n- \uc0c1\ud0dc \ubaa8\ub378/\uacfc\uae08 \uaddc\uce59 UI/API/DB \uc77c\uce58\n- \ucde8\uc18c/\uc7ac\uc2dc\ub3c4/\ud3b8\uc9d1 \uc81c\uc57d \uaddc\uce59 \uc900\uc218\n- \uc2e0\uace0/\uad8c\ud55c/\uc624\ub958 \ucf54\ub4dc \uc815\ucc45 \uac80\uc99d\n\n### \ud488\uc9c8\n\n- \uc131\uacf5\ub960 90% \uc774\uc0c1\n- \uc0ac\uc6a9 \uac00\ub2a5\ub960 95% \uc774\uc0c1\n- \ud0c0\uc784\uc544\uc6c3/\uc7ac\uc2dc\ub3c4 \uc815\ucc45 \uac80\uc99d\n\n### \uc6b4\uc601\n\n- \ud658\uacbd \ubd84\ub9ac(dev/staging/prod)\n- \ub85c\uadf8/\uc54c\ub9bc/\ube44\uc6a9 \ud1b5\uc81c \ub3d9\uc791\n- \ubc30\ud3ec \ubc0f \uae30\ubcf8 \uc0ac\uc6a9\uc790 \uac00\uc774\ub4dc \uc900\ube44\n\n---\n\n> \ubb38\uc11c \ubc84\uc804: v1.0\n> \ucd5c\uc885 \uc5c5\ub370\uc774\ud2b8: 2026-02-07\n",
+  "verification": "Regenerated all result JSON files and validated UTF-8 parsing integrity.\nClarified KPI formula with explicit count-based numerator/denominator to remove ambiguity."
+}
