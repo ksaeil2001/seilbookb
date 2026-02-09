@@ -1,0 +1,30 @@
+{
+  "name": "seilbookb-manga-translation-mvp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "이미지 기반 만화/웹툰 AI 번역 서비스 MVP",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "next": "14.2.18",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.49.1",
+    "@testing-library/jest-dom": "6.6.3",
+    "@testing-library/react": "16.1.0",
+    "tailwindcss": "3.4.17",
+    "typescript": "5.6.3",
+    "vitest": "2.1.8"
+  }
+}

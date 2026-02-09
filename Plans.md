@@ -745,6 +745,28 @@
 - **근거**: PRD의 크레딧 원장 모델과 일관된 결제 후 처리 기준을 유지하기 위함이다.
 - **결정**: 웹훅 및 결제 조회/취소 API는 MVP 후속 범위로 분리한다.
 - **근거**: 6주 로드맵에서 핵심 결제 성공 경로와 무결성 보장을 우선하기 위함이다.
+- **결정**: Top 8 리스크 즉시 대응은 문서/정책 전용 범위로 실행한다.
+- **근거**: 현재 저장소가 문서 중심이므로 코드 구현 이전에 운영 규칙과 검증 명령을 SSOT에 고정하기 위함이다.
+- **결정**: Top 8 리스크는 묶음 병행 방식으로 운영한다.
+- **근거**: 재현성, 외부 API 가용성, 인증/결제, 큐/경합, 테스트 게이트를 분리하면 우선순위 충돌 없이 즉시 통제가 가능하다.
+- **결정**: Top 8 최소 테스트 게이트(Auth/Payment/Fallback/Queue/app_code)를 차단형 규칙으로 강제한다.
+- **근거**: 품질 게이트가 문서상 선언에만 머무르지 않도록 최소 검증 단위를 즉시 대응 기준으로 고정하기 위함이다.
+- **결정**: Top 8 검증은 rg 기반 키워드 점검과 plans_sync 동기화 검증을 함께 수행한다.
+- **근거**: AGENTS, PRD, 리스크 레지스터, Plans 간 용어 드리프트를 조기에 차단하기 위함이다.
+- **결정**: 프로젝트 라이선스는 MIT로 고정하고 LICENSE/NOTICE를 배포 필수 산출물로 유지한다.
+- **근거**: 오픈소스 사용 고지 의무를 충족하고 컴플라이언스 검증 기준을 명확히 하기 위함이다.
+- **결정**: SBOM 산출물은 SPDX JSON과 CycloneDX JSON을 병행 유지한다.
+- **근거**: 내부 점검과 외부 제출 포맷을 동시에 충족하고 추적성을 높이기 위함이다.
+- **결정**: 의존성 버전 정책은 exact 고정으로 운영한다.
+- **근거**: 환경별 재현성 드리프트를 줄이고 릴리즈 회귀 분석을 단순화하기 위함이다.
+- **결정**: 3차 우선순위는 컴플라이언스 전용 Top 8(C-01~C-08)으로 재구성한다.
+- **근거**: 문서/증빙 기반 차단 이슈를 우선 해소해 오픈소스 사용 판정을 가능 상태로 전환하기 위함이다.
+- **결정**: 문서/검증 범위 100% 판정은 차단 이슈 0건 + DR Open 0건 + CI 강제 검증 통과를 동시에 만족해야 한다.
+- **근거**: 절대 무고장 대신 검증 가능한 보장 범위를 명확히 정의해 운영 해석 오차를 제거하기 위함이다.
+- **결정**: DR-07은 외부 SDK 정책 문서 해시 자동 감시를 도입해 Closed로 관리한다.
+- **근거**: Google/Toss/OpenAI 정책 변화 리스크를 수동 확인이 아닌 주기적 자동 감시로 통제하기 위함이다.
+- **결정**: 외부 SDK 정책 변화 감시는 daily 스케줄 + 수동 실행(workflow_dispatch)으로 운영한다.
+- **근거**: 일일 감시로 빠른 탐지를 확보하고 필요 시 즉시 재검증할 수 있도록 하기 위함이다.
 
 ## 5. 검증 계획
 
@@ -754,26 +776,51 @@
 - rg -n "\?{2,}" Plans.json Plans.md
 - rg -n "payment-widget-sdk|PaymentWidget\(|updateAmount\(|ready 이벤트" Plans.json
   Plans.md
-- rg -n "TOSS_(UNAUTHORIZED_KEY|FORBIDDEN_REQUEST|NOT_FOUND_PAYMENT_SESSION)"
-  Plans.json Plans.md
+- rg -n
+  "GOOGLE_ID_TOKEN_INVALID|GOOGLE_AUTH_EXCHANGE_FAILED|PAYMENT_AMOUNT_MISMATCH|NOT_FOUND_PAYMENT_SESSION|UNAUTHORIZED_KEY|FORBIDDEN_REQUEST|NOT_REGISTERED_PAYMENT_WIDGET|IDEMPOTENCY_IN_PROGRESS|FX_RATE_UNAVAILABLE"
+  AGENTS.md docs/specs/PRD.md Plans.md
+- rg -n "C-01|C-02|C-03|C-04|C-05|C-06|C-07|C-08"
+  docs/specs/OSS_EXTERNAL_DEPENDENCY_RISK_REGISTER.md
+- rg -n "Idempotency-Key|fail-closed|fallback_rate|OSS 컴플라이언스 최소 게이트" AGENTS.md
+  docs/specs/PRD.md Plans.md
+- python scripts/compliance_gate.py
+- python scripts/sdk_policy_watch.py --watchlist
+  docs/compliance/external_sdk_watchlist.json --snapshot
+  docs/compliance/external_sdk_snapshot.json --strict
+- powershell -Command "Test-Path LICENSE; Test-Path NOTICE; Test-Path
+  package.json; Test-Path package-lock.json; Test-Path requirements.txt;
+  Test-Path requirements-dev.txt; Test-Path
+  docs/compliance/OSS_LICENSE_POLICY.md; Test-Path
+  docs/compliance/DEPENDENCY_VERSION_MATRIX.md; Test-Path
+  docs/compliance/THIRD_PARTY_NOTICES.md; Test-Path
+  docs/compliance/SBOM.spdx.json; Test-Path docs/compliance/SBOM.cyclonedx.json"
+- rg -n "MIT|Apache-2.0|LGPL|BSD-3-Clause"
+  docs/compliance/DEPENDENCY_VERSION_MATRIX.md
+  docs/compliance/THIRD_PARTY_NOTICES.md
 
 ## 6. 리스크 평가
 
 | 리스크 | 확률 | 영향 | 완화 전략 |
 | --- | --- | --- | --- |
+| 의존성 매니페스트와 락파일 부재로 환경별 재현성이 깨질 수 있다. | high | high | frontend/backend 매니페스트 표준과 버전 고정 정책을 문서에 고정하고 plans_sync + 키워드 검증 명령을 릴리즈 게이트로 강제한다. |
 | 업로드 입력 검증이 약해 비정상 파일이 파이프라인을 오염시킬 수 있다. | medium | high | Phase 1에서 파일 형식, 압축 구조, 페이지 수 상한 검증 테스트를 RED로 먼저 고정한다. |
-| 상태 전이 불일치로 과금과 KPI 집계가 틀어질 수 있다. | high | high | Phase 2에서 job_status와 page_status 전이 테스트를 통합해 SSOT 준수를 강제한다. |
-| 외부 AI API 장애로 처리 지연 또는 실패율 급증이 발생할 수 있다. | medium | high | Phase 3에서 타임아웃, 폴백, fail-closed 분기를 테스트와 함께 구현한다. |
+| 상태 전이 불일치로 과금과 KPI 집계가 틀어질 수 있다. | high | high | job_status/page_status 전이와 함께 Idempotency-Key 경합, 중복 소비 방지, 재시도 상한(PAGE_RETRY_LIMIT_EXCEEDED) 규칙을 묶어서 SSOT 준수를 강제한다. |
+| 외부 AI API 장애로 처리 지연 또는 실패율 급증이 발생할 수 있다. | medium | high | 공급자별 타임아웃/재시도/서킷브레이커를 분리 운영하고 fallback_rate와 처리시간 p95를 운영 지표로 강제한다. |
+| 최소 테스트 게이트가 미구현 상태로 남아 품질 게이트가 선언에만 머무를 수 있다. | high | high | Auth, Payment, Fallback, Queue, app_code 매핑 회귀를 Top 8 최소 테스트 게이트로 문서에 고정하고 미충족 시 다음 Phase 진행을 차단한다. |
 | 레이아웃 품질 게이트 누락으로 읽기 경험이 저하될 수 있다. | medium | high | Phase 4에서 bbox_overflow와 min_font_pt 경계값 테스트를 의무화한다. |
 | UI 오류 코드 매핑 누락으로 사용자 안내가 부정확해질 수 있다. | medium | medium | Phase 5에서 오류 매핑 단위 테스트를 추가하고 app_code 대응표를 유지한다. |
 | 플레이키 E2E로 출시 의사결정 신뢰도가 떨어질 수 있다. | high | medium | Phase 6에서 데이터 고정 샘플과 재시도 정책을 분리해 flaky 원인을 통제한다. |
-| 일일 비용 상한 관리 실패로 운영 비용이 급증할 수 있다. | medium | high | 비용 이벤트 원장을 기반으로 상한 초과 시 신규 작업을 차단하고 경보를 발송한다. |
+| 일일 비용 상한 관리 실패로 운영 비용이 급증할 수 있다. | medium | high | 비용 이벤트 원장과 환율 스냅샷 이상 신호를 함께 감시하고 COST_DAILY_LIMIT_EXCEEDED 또는 FX_RATE_UNAVAILABLE 발생 시 fail-closed와 운영 알림을 강제한다. |
 | 문서 동기화 누락으로 팀 해석이 분산될 수 있다. | low | medium | CI에서 validate와 check를 강제해 Plans.json과 Plans.md의 드리프트를 차단한다. |
-| Google 외부 스크립트 또는 ID 토큰 검증 실패로 로그인 장애가 발생할 수 있다. | medium | high | GOOGLE_ID_TOKEN_INVALID, GOOGLE_AUTH_EXCHANGE_FAILED, GOOGLE_CLIENT_ID_NOT_CONFIGURED를 표준 app_code로 노출하고 재시도 UX를 제공한다. |
-| 토스 API 키 불일치 또는 시크릿 키 인코딩 오류로 결제 승인에 실패할 수 있다. | medium | high | UNAUTHORIZED_KEY, FORBIDDEN_REQUEST를 표준 app_code로 매핑하고 키 매칭 검증 체크리스트를 운영한다. |
+| Google 외부 스크립트 또는 ID 토큰 검증 실패로 로그인 장애가 발생할 수 있다. | medium | high | GOOGLE_ID_TOKEN_INVALID, GOOGLE_AUTH_EXCHANGE_FAILED, GOOGLE_CLIENT_ID_NOT_CONFIGURED를 표준 app_code로 노출하고 대체 로그인 경로를 즉시 우선 노출한다. |
+| 토스 API 키 불일치 또는 시크릿 키 인코딩 오류로 결제 승인에 실패할 수 있다. | medium | high | UNAUTHORIZED_KEY, FORBIDDEN_REQUEST, NOT_REGISTERED_PAYMENT_WIDGET를 표준 app_code로 매핑하고 위젯 렌더 완료 전 결제 버튼 비활성을 강제한다. |
 | 리다이렉트 URL 파라미터 금액 변조로 결제 무결성이 훼손될 수 있다. | medium | high | prepare 저장 amount/orderId와 successUrl 파라미터를 비교해 PAYMENT_AMOUNT_MISMATCH 시 승인 차단한다. |
 | 결제 요청 후 승인 지연(10분 초과)으로 세션 만료가 발생할 수 있다. | medium | medium | NOT_FOUND_PAYMENT_SESSION 처리와 사용자 재시도 동선, 만료 안내 메시지를 표준화한다. |
 | 결제위젯 미등록 또는 선택자 오류로 결제 UI가 렌더링되지 않을 수 있다. | low | medium | UNAUTHORIZED_KEY, NOT_REGISTERED_PAYMENT_WIDGET 오류를 감지하고 비동기 렌더링 완료(await) 기반 버튼 활성화 규칙을 강제한다. |
+| LICENSE, NOTICE, SBOM 산출물이 누락되면 배포 컴플라이언스가 무효화될 수 있다. | medium | high | 컴플라이언스 최소 게이트로 파일 존재성 검증을 차단형으로 운영하고 누락 시 릴리즈를 중단한다. |
+| 금지 라이선스(GPL, AGPL, SSPL) 의존성이 유입될 수 있다. | low | high | OSS 라이선스 정책에서 금지군을 명시하고 의존성 추가 시 사전 승인을 필수화한다. |
+| 조건부 라이선스(LGPL) 항목의 고지/사용 조건 관리가 누락될 수 있다. | medium | medium | DEPENDENCY_VERSION_MATRIX와 THIRD_PARTY_NOTICES에 조건부 허용 사유를 고정하고 배포 시 함께 검증한다. |
+| 외부 SDK 정책 문서 변경을 늦게 감지하면 로그인/결제/AI 연동 가이드가 빠르게 구식이 될 수 있다. | medium | high | external_sdk_watchlist/snapshot 기반 해시 감시와 external-sdk-watch 워크플로를 daily로 운영하고 변화 감지 시 fail-closed로 차단한다. |
 
 ## 7. 롤백 전략
 
@@ -865,6 +912,11 @@
 
 - 문서 손상 재발 방지를 위해 validate 단계에서 연속 물음표 패턴을 차단한다.
 - 각 Phase 종료 시 quality_gate 항목과 진행률을 함께 업데이트한다.
+- Top 8 즉시 대응은 AGENTS, PRD, 리스크 레지스터, Plans를 동시 갱신하고 plans_sync + rg 검증 명령으로
+  정합성을 고정한다.
+- 오픈소스 컴플라이언스는 LICENSE/NOTICE/SBOM/매니페스트 고정과 정책 문서를 함께 갱신해야 통과로 간주한다.
+- DR-07은 외부 SDK 정책 변화 자동 감시를 도입해 Open에서 Closed로 전환했다.
+- 100% 판정은 문서/검증 범위 기준이며 시점고정(2026-02-09)으로 관리한다.
 
 ### 블로커
 

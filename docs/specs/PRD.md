@@ -239,6 +239,10 @@
 - DAU/MAU
 - 크레딧 소진율
 - 유료 전환율(관찰 지표)
+- auth_failure_rate = failed_auth_events / total_auth_attempts
+- payment_failure_rate = failed_payment_confirms / total_payment_confirms
+- queue_depth = pending_queue_items
+- hard_gate_fail_rate = hard_gate_failed_pages / terminal_non_canceled_pages
 
 ---
 
@@ -248,6 +252,36 @@
 - 비용 폭주: 일일 상한/차단/경보
 - 과부하: 큐 모니터링 + 동시성 제어
 - 정책 위반: 신고/검토/차단 프로세스
+
+### Top 8 Immediate Controls
+
+- `D-01` 트리거: 환경별 재현 실패, 관측 지표: bootstrap 실패율, 즉시 조치: 매니페스트/락파일 없는 변경 배포 차단, 복구 조건: 버전 고정 정책 문서와 SSOT 검증 명령 통과
+- `O-01` 트리거: 외부 AI 타임아웃 급증, 관측 지표: `fallback_rate`, p95 처리시간, 즉시 조치: 공급자별 서킷브레이커/재시도 분리 적용, 복구 조건: fallback_rate 정상화와 오류율 기준선 회복
+- `O-08` 트리거: 테스트 게이트 미구현 또는 우회, 관측 지표: 최소 게이트 누락 항목 수, 즉시 조치: 품질 게이트 미충족 상태에서 다음 Phase 진행 차단, 복구 조건: Auth/Payment/Fallback/Queue/app_code 회귀 게이트 문서 검증 완료
+- `D-02` 트리거: Google 스크립트/토큰 검증 실패 증가, 관측 지표: `GOOGLE_ID_TOKEN_INVALID`, `GOOGLE_AUTH_EXCHANGE_FAILED`, 즉시 조치: 대체 로그인 경로 우선 노출, 복구 조건: Google 인증 오류율 정상화
+- `D-05` 트리거: 중복 처리/재시도 폭증, 관측 지표: `IDEMPOTENCY_IN_PROGRESS`, `PAGE_RETRY_LIMIT_EXCEEDED`, `QUEUE_CAPACITY_EXCEEDED`, 즉시 조치: 큐 백프레셔와 멱등 키 경합 차단 강화, 복구 조건: 재시도 상한 초과 비율 기준선 회복
+- `D-07` 트리거: 결제 무결성 경고 발생, 관측 지표: `PAYMENT_AMOUNT_MISMATCH`, `NOT_FOUND_PAYMENT_SESSION`, 즉시 조치: `amount/orderId` 재검증 실패 거래 승인 차단, 복구 조건: 무결성 실패 0건 유지
+- `O-02` 트리거: 비용/환율 스냅샷 이상, 관측 지표: `COST_DAILY_LIMIT_EXCEEDED`, `FX_RATE_UNAVAILABLE`, 즉시 조치: fail-closed로 신규 작업 차단 및 운영 알림 발송, 복구 조건: 환율/비용 신호 정상화와 차단 해제 승인
+- `O-04` 트리거: 결제 위젯 키/렌더 실패, 관측 지표: `UNAUTHORIZED_KEY`, `FORBIDDEN_REQUEST`, `NOT_REGISTERED_PAYMENT_WIDGET`, 즉시 조치: 위젯 렌더 실패 시 결제 버튼 비활성 유지, 복구 조건: 키 검증 통과 및 렌더 성공률 회복
+
+---
+
+### OSS License Compliance Controls
+
+- 트리거: 라이선스 고지 파일 누락, 관측 지표: `LICENSE/NOTICE/THIRD_PARTY_NOTICES` 존재성 검증 실패, 즉시 조치: 배포 차단, 복구 조건: 고지 파일 복구와 검증 통과
+- 트리거: SBOM 산출물 누락, 관측 지표: `SBOM.spdx.json/SBOM.cyclonedx.json` 존재성 검증 실패, 즉시 조치: 릴리즈 승인 중단, 복구 조건: SBOM 2종 동기화 완료
+- 트리거: 매니페스트/락파일 미고정, 관측 지표: exact 버전 정책 위반 탐지, 즉시 조치: 머지 차단, 복구 조건: `package-lock.json` 및 `requirements*` 고정 버전 반영
+- 트리거: 금지 라이선스 감지(`GPL/AGPL/SSPL`), 관측 지표: 라이선스 정책 검증 실패, 즉시 조치: 의존성 추가 차단, 복구 조건: 제거 또는 사전 승인 완료
+
+---
+
+### External SDK Policy Drift Control
+
+- 트리거: Google/Toss/OpenAI 공식 문서 해시 변경 또는 fetch 오류
+- 관측 지표: `external_sdk_watch_report.changed_items`, `external_sdk_watch_report.fetch_errors`
+- 즉시 조치: `external-sdk-watch` 워크플로 실패 처리 + 이슈 자동 생성(권한 없으면 아티팩트만 저장)
+- 복구 조건: watchlist/snapshot 재검증 후 `sdk_policy_watch --strict` 통과
+- 운영 기준: 문서/검증 범위 100% 판정은 DR Open 0건과 함께 위 통제가 정상 동작해야 유지된다.
 
 ---
 
@@ -271,6 +305,8 @@
 - 환경 분리(dev/staging/prod)
 - 로그/알림/비용 통제 동작
 - 배포 및 기본 사용자 가이드 준비
+- OSS 컴플라이언스 최소 게이트 통과(`LICENSE`, `NOTICE`, `SBOM 2종`, 매니페스트/락파일)
+- 컴플라이언스 문서 경로 확정(`docs/compliance/*`) 및 검증 명령 통과
 
 ---
 

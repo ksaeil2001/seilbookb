@@ -1,0 +1,176 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "seilbookb-manga-translation-mvp-sbom",
+  "documentNamespace": "https://seilbookb.dev/sbom/2026-02-09/spdx",
+  "creationInfo": {
+    "created": "2026-02-09T00:00:00Z",
+    "creators": [
+      "Tool: manual-doc-policy-generator",
+      "Organization: seilbookb"
+    ]
+  },
+  "packages": [
+    {
+      "name": "next",
+      "SPDXID": "SPDXRef-Package-next",
+      "versionInfo": "14.2.18",
+      "downloadLocation": "https://www.npmjs.com/package/next/v/14.2.18",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "name": "react",
+      "SPDXID": "SPDXRef-Package-react",
+      "versionInfo": "18.3.1",
+      "downloadLocation": "https://www.npmjs.com/package/react/v/18.3.1",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "name": "react-dom",
+      "SPDXID": "SPDXRef-Package-react-dom",
+      "versionInfo": "18.3.1",
+      "downloadLocation": "https://www.npmjs.com/package/react-dom/v/18.3.1",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "name": "typescript",
+      "SPDXID": "SPDXRef-Package-typescript",
+      "versionInfo": "5.6.3",
+      "downloadLocation": "https://www.npmjs.com/package/typescript/v/5.6.3",
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "name": "tailwindcss",
+      "SPDXID": "SPDXRef-Package-tailwindcss",
+      "versionInfo": "3.4.17",
+      "downloadLocation": "https://www.npmjs.com/package/tailwindcss/v/3.4.17",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "name": "vitest",
+      "SPDXID": "SPDXRef-Package-vitest",
+      "versionInfo": "2.1.8",
+      "downloadLocation": "https://www.npmjs.com/package/vitest/v/2.1.8",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "name": "@testing-library/react",
+      "SPDXID": "SPDXRef-Package-testing-library-react",
+      "versionInfo": "16.1.0",
+      "downloadLocation": "https://www.npmjs.com/package/@testing-library/react/v/16.1.0",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "name": "@testing-library/jest-dom",
+      "SPDXID": "SPDXRef-Package-testing-library-jest-dom",
+      "versionInfo": "6.6.3",
+      "downloadLocation": "https://www.npmjs.com/package/@testing-library/jest-dom/v/6.6.3",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "name": "@playwright/test",
+      "SPDXID": "SPDXRef-Package-playwright-test",
+      "versionInfo": "1.49.1",
+      "downloadLocation": "https://www.npmjs.com/package/@playwright/test/v/1.49.1",
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "name": "fastapi",
+      "SPDXID": "SPDXRef-Package-fastapi",
+      "versionInfo": "0.115.6",
+      "downloadLocation": "https://pypi.org/project/fastapi/0.115.6/",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "name": "pydantic",
+      "SPDXID": "SPDXRef-Package-pydantic",
+      "versionInfo": "2.10.5",
+      "downloadLocation": "https://pypi.org/project/pydantic/2.10.5/",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "name": "sqlalchemy",
+      "SPDXID": "SPDXRef-Package-sqlalchemy",
+      "versionInfo": "2.0.36",
+      "downloadLocation": "https://pypi.org/project/SQLAlchemy/2.0.36/",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "name": "alembic",
+      "SPDXID": "SPDXRef-Package-alembic",
+      "versionInfo": "1.14.0",
+      "downloadLocation": "https://pypi.org/project/alembic/1.14.0/",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "name": "redis",
+      "SPDXID": "SPDXRef-Package-redis",
+      "versionInfo": "5.2.1",
+      "downloadLocation": "https://pypi.org/project/redis/5.2.1/",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "name": "psycopg[binary]",
+      "SPDXID": "SPDXRef-Package-psycopg-binary",
+      "versionInfo": "3.2.3",
+      "downloadLocation": "https://pypi.org/project/psycopg/3.2.3/",
+      "licenseConcluded": "LGPL-3.0-or-later",
+      "licenseDeclared": "LGPL-3.0-or-later"
+    },
+    {
+      "name": "uvicorn[standard]",
+      "SPDXID": "SPDXRef-Package-uvicorn-standard",
+      "versionInfo": "0.34.0",
+      "downloadLocation": "https://pypi.org/project/uvicorn/0.34.0/",
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause"
+    },
+    {
+      "name": "httpx",
+      "SPDXID": "SPDXRef-Package-httpx",
+      "versionInfo": "0.28.1",
+      "downloadLocation": "https://pypi.org/project/httpx/0.28.1/",
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause"
+    },
+    {
+      "name": "python-dotenv",
+      "SPDXID": "SPDXRef-Package-python-dotenv",
+      "versionInfo": "1.0.1",
+      "downloadLocation": "https://pypi.org/project/python-dotenv/1.0.1/",
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause"
+    },
+    {
+      "name": "pytest",
+      "SPDXID": "SPDXRef-Package-pytest",
+      "versionInfo": "8.3.4",
+      "downloadLocation": "https://pypi.org/project/pytest/8.3.4/",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "name": "pytest-asyncio",
+      "SPDXID": "SPDXRef-Package-pytest-asyncio",
+      "versionInfo": "0.24.0",
+      "downloadLocation": "https://pypi.org/project/pytest-asyncio/0.24.0/",
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0"
+    }
+  ]
+}
