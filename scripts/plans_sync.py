@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import re
 import sys
+import textwrap
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +23,8 @@ PHASE_STATUS_VALUES = {"pending", "in_progress", "complete"}
 RISK_LEVEL_VALUES = {"low", "medium", "high"}
 REQUIRED_DOCUMENT_MODE = "future_implementation_roadmap"
 REQUIRED_COMMAND_POLICY = "example_only"
+CORRUPTED_TEXT_PATTERN = re.compile(r"\?{2,}")
+MAX_LINE_LENGTH = 80
 
 
 def _is_number(value: Any) -> bool:
@@ -46,9 +50,27 @@ def _validate_item_done_list(value: Any, prefix: str, errors: list[str]) -> None
             errors.append(f"{item_prefix}.done은 boolean이어야 합니다.")
 
 
+def _validate_no_corrupted_text(value: Any, prefix: str, errors: list[str]) -> None:
+    if isinstance(value, str):
+        if CORRUPTED_TEXT_PATTERN.search(value):
+            preview = value.replace("\n", " ")[:80]
+            errors.append(
+                f"{prefix} 문자열에 손상 패턴(연속 물음표)이 있습니다: `{preview}`"
+            )
+        return
+    if isinstance(value, list):
+        for index, item in enumerate(value):
+            _validate_no_corrupted_text(item, f"{prefix}[{index}]", errors)
+        return
+    if isinstance(value, dict):
+        for key, item in value.items():
+            child_prefix = f"{prefix}.{key}" if prefix else str(key)
+            _validate_no_corrupted_text(item, child_prefix, errors)
+
+
 def _load_json(path: Path) -> Any:
     try:
-        with path.open("r", encoding="utf-8") as file:
+        with path.open("r", encoding="utf-8-sig") as file:
             return json.load(file)
     except json.JSONDecodeError as error:
         raise ValueError(f"JSON 파싱 실패: {error}") from error
@@ -60,6 +82,7 @@ def _validate_schema(data: Any) -> list[str]:
     errors: list[str] = []
     if not isinstance(data, dict):
         return ["루트 객체는 JSON object여야 합니다."]
+    _validate_no_corrupted_text(data, "$", errors)
 
     expected_keys = [item[0] for item in EXPECTED_TOP_LEVEL]
     actual_keys = list(data.keys())
@@ -341,38 +364,105 @@ def _bool_to_checkbox(value: bool) -> str:
     return "[x]" if value else "[ ]"
 
 
-def _render_list(lines: list[str], title: str, values: list[str]) -> None:
-    lines.append(f"### {title}")
-    if not values:
-        lines.append("- (없음)")
-    else:
-        for value in values:
-            lines.append(f"- {value}")
+def _trim_trailing_blank_lines(lines: list[str]) -> None:
+    while lines and lines[-1] == "":
+        lines.pop()
+
+
+def _append_heading(lines: list[str], heading: str) -> None:
+    _trim_trailing_blank_lines(lines)
+    if lines:
+        lines.append("")
+    lines.append(heading)
     lines.append("")
 
 
-def _render_item_done_list(lines: list[str], title: str, values: list[dict[str, Any]]) -> None:
-    lines.append(f"#### {title}")
+def _finalize_block(lines: list[str]) -> None:
+    _trim_trailing_blank_lines(lines)
+    lines.append("")
+
+
+def _with_phase_prefix(title: str, phase_id: Any | None) -> str:
+    if phase_id in (None, ""):
+        return title
+    return f"Phase {phase_id} - {title}"
+
+
+def _append_wrapped_text(
+    lines: list[str],
+    text: str,
+    initial_indent: str = "",
+    subsequent_indent: str = "",
+) -> None:
+    wrapped = textwrap.wrap(
+        text,
+        width=MAX_LINE_LENGTH,
+        initial_indent=initial_indent,
+        subsequent_indent=subsequent_indent,
+        break_long_words=False,
+        break_on_hyphens=False,
+    )
+    if wrapped:
+        lines.extend(wrapped)
+    else:
+        lines.append(initial_indent.rstrip())
+
+
+def _append_bullet(lines: list[str], text: str) -> None:
+    _append_wrapped_text(lines, text, initial_indent="- ", subsequent_indent="  ")
+
+
+def _append_blockquote(lines: list[str], text: str) -> None:
+    _append_wrapped_text(lines, text, initial_indent="> ", subsequent_indent="> ")
+
+
+def _render_list(
+    lines: list[str],
+    title: str,
+    values: list[str],
+    phase_id: Any | None = None,
+    heading_level: int = 3,
+) -> None:
+    _append_heading(lines, f"{'#' * heading_level} {_with_phase_prefix(title, phase_id)}")
     if not values:
-        lines.append("- (없음)")
+        _append_bullet(lines, "(없음)")
     else:
         for value in values:
-            lines.append(f"- {_bool_to_checkbox(bool(value.get('done')))} {value.get('item', '')}")
-    lines.append("")
+            _append_bullet(lines, value)
+    _finalize_block(lines)
+
+
+def _render_item_done_list(
+    lines: list[str],
+    title: str,
+    values: list[dict[str, Any]],
+    phase_id: Any | None = None,
+    heading_level: int = 4,
+) -> None:
+    _append_heading(lines, f"{'#' * heading_level} {_with_phase_prefix(title, phase_id)}")
+    if not values:
+        _append_bullet(lines, "(없음)")
+    else:
+        for value in values:
+            _append_bullet(
+                lines,
+                f"{_bool_to_checkbox(bool(value.get('done')))} {value.get('item', '')}",
+            )
+    _finalize_block(lines)
 
 
 def _render_markdown(data: dict[str, Any]) -> str:
     lines: list[str] = []
-    lines.append("# Plans")
-    lines.append("")
-    lines.append("> 이 문서는 `Plans.json`에서 자동 생성되는 **MVP 6주 로드맵 문서(예시 명령 포함)** 입니다.")
-    lines.append("> 직접 수정하지 말고 `python scripts/plans_sync.py render --input Plans.json --output Plans.md`를 실행하세요.")
-    lines.append("> 테스트 명령은 즉시 실행 강제가 아닌 구현 단계 구체화를 위한 예시입니다.")
-    lines.append("> ⚠️ Phase 게이트 통과 전 다음 단계 진행 금지")
-    lines.append("")
+    _append_heading(lines, "# Plans")
+    _append_blockquote(lines, "이 문서는 `Plans.json`에서 자동 생성되는 **MVP 6주 로드맵 문서(예시 명령 포함)** 입니다.")
+    _append_blockquote(lines, "직접 수정하지 말고 아래 명령으로 재생성하세요.")
+    _append_blockquote(lines, "`python scripts/plans_sync.py render --input Plans.json --output Plans.md`")
+    _append_blockquote(lines, "테스트 명령은 즉시 실행 강제가 아닌 구현 단계 구체화를 위한 예시입니다.")
+    _append_blockquote(lines, "⚠️ Phase 게이트 통과 전 다음 단계 진행 금지")
+    _finalize_block(lines)
 
     purpose = data["1_Purpose"]
-    lines.append("## 1. 문서 목적")
+    _append_heading(lines, "## 1. 문서 목적")
     ordered_purpose_keys = [
         "document_mode",
         "horizon_weeks",
@@ -382,24 +472,24 @@ def _render_markdown(data: dict[str, Any]) -> str:
     ]
     for key in ordered_purpose_keys:
         if key in purpose:
-            lines.append(f"- **{key}**: {purpose[key]}")
+            _append_bullet(lines, f"**{key}**: {purpose[key]}")
     for extra_key in sorted(key for key in purpose.keys() if key not in set(ordered_purpose_keys)):
-        lines.append(f"- **{extra_key}**: {purpose[extra_key]}")
-    lines.append("")
+        _append_bullet(lines, f"**{extra_key}**: {purpose[extra_key]}")
+    _finalize_block(lines)
 
     strategy = data["2_Testing_Strategy"]
-    lines.append("## 2. 테스트 전략")
+    _append_heading(lines, "## 2. 테스트 전략")
     if "command_policy" in strategy:
-        lines.append(f"- **command_policy**: {strategy['command_policy']}")
-    lines.append("")
+        _append_bullet(lines, f"**command_policy**: {strategy['command_policy']}")
+    _finalize_block(lines)
     frameworks = strategy.get("frameworks", {})
-    lines.append("### 프레임워크")
+    _append_heading(lines, "### 프레임워크")
     if frameworks:
         for key in sorted(frameworks.keys()):
-            lines.append(f"- **{key}**: {frameworks[key]}")
+            _append_bullet(lines, f"**{key}**: {frameworks[key]}")
     else:
-        lines.append("- (없음)")
-    lines.append("")
+        _append_bullet(lines, "(없음)")
+    _finalize_block(lines)
     _render_list(lines, "원칙", strategy.get("principles", []))
     _render_list(
         lines,
@@ -409,21 +499,21 @@ def _render_markdown(data: dict[str, Any]) -> str:
     if "temporary_assumptions" in strategy:
         _render_list(lines, "임시 가정", strategy.get("temporary_assumptions", []))
 
-    lines.append("## 3. 로드맵 진행")
-    lines.append("")
+    _append_heading(lines, "## 3. 로드맵 진행")
     for phase in data["3_Progress"]:
-        lines.append(f"## Phase {phase['phase_id']}: {phase['feature']}")
-        lines.append(f"- **목표 기간**: {phase.get('target_window', '')}")
-        lines.append(f"- **예상 소요 시간**: {phase.get('estimated_hours', '')}h")
-        lines.append(f"- **상태**: {phase.get('status', '')}")
-        lines.append(f"- **목표**: {phase.get('details', '')}")
-        lines.append(f"- **완료 신호(게이트)**: {phase.get('exit_signal', '')}")
-        lines.append("")
-        _render_list(lines, "산출물/수용 기준", phase.get("acceptance_criteria_mapping", []))
-        _render_list(lines, "의존성", phase.get("dependencies", []))
-        _render_list(lines, "주요 리스크", phase.get("risks", []))
-        _render_list(lines, "엣지 케이스 범위", phase.get("edge_case_coverage", []))
-        lines.append("### 개발 원칙 체크리스트 (RED/GREEN/REFACTOR)")
+        phase_id = phase.get("phase_id", "")
+        _append_heading(lines, f"## Phase {phase_id}: {phase['feature']}")
+        _append_bullet(lines, f"**목표 기간**: {phase.get('target_window', '')}")
+        _append_bullet(lines, f"**예상 소요 시간**: {phase.get('estimated_hours', '')}h")
+        _append_bullet(lines, f"**상태**: {phase.get('status', '')}")
+        _append_bullet(lines, f"**목표**: {phase.get('details', '')}")
+        _append_bullet(lines, f"**완료 신호(게이트)**: {phase.get('exit_signal', '')}")
+        _finalize_block(lines)
+        _render_list(lines, "산출물/수용 기준", phase.get("acceptance_criteria_mapping", []), phase_id=phase_id)
+        _render_list(lines, "의존성", phase.get("dependencies", []), phase_id=phase_id)
+        _render_list(lines, "주요 리스크", phase.get("risks", []), phase_id=phase_id)
+        _render_list(lines, "엣지 케이스 범위", phase.get("edge_case_coverage", []), phase_id=phase_id)
+        _append_heading(lines, f"### Phase {phase_id} - 개발 원칙 체크리스트 (RED/GREEN/REFACTOR)")
         step_map = {
             item["step"]: item
             for item in phase.get("checklist", [])
@@ -431,97 +521,103 @@ def _render_markdown(data: dict[str, Any]) -> str:
         }
         for step in EXPECTED_CHECKLIST_STEPS:
             entry = step_map.get(step, {"desc": "(누락)", "done": False})
-            lines.append(f"- {_bool_to_checkbox(bool(entry.get('done')))} **{step}**: {entry.get('desc', '')}")
-        lines.append("")
+            _append_bullet(
+                lines,
+                f"{_bool_to_checkbox(bool(entry.get('done')))} **{step}**: {entry.get('desc', '')}",
+            )
+        _finalize_block(lines)
 
         gate = phase.get("quality_gate", {})
-        lines.append("### 품질 게이트 (차단형)")
-        lines.append(f"- **blocking**: {gate.get('blocking', False)}")
-        lines.append(f"- **stop_message**: {gate.get('stop_message', '')}")
-        lines.append("")
-        _render_item_done_list(lines, "TDD 준수", gate.get("tdd_compliance", []))
-        _render_item_done_list(lines, "빌드/테스트", gate.get("build_and_tests", []))
-        _render_item_done_list(lines, "코드 품질", gate.get("code_quality", []))
-        _render_item_done_list(lines, "보안/성능", gate.get("security_and_performance", []))
-        _render_item_done_list(lines, "문서화", gate.get("documentation", []))
-        _render_item_done_list(lines, "수동 검증", gate.get("manual_testing", []))
+        _append_heading(lines, f"### Phase {phase_id} - 품질 게이트 (차단형)")
+        _append_bullet(lines, f"**blocking**: {gate.get('blocking', False)}")
+        _append_bullet(lines, f"**stop_message**: {gate.get('stop_message', '')}")
+        _finalize_block(lines)
+        _render_item_done_list(lines, "TDD 준수", gate.get("tdd_compliance", []), phase_id=phase_id)
+        _render_item_done_list(lines, "빌드/테스트", gate.get("build_and_tests", []), phase_id=phase_id)
+        _render_item_done_list(lines, "코드 품질", gate.get("code_quality", []), phase_id=phase_id)
+        _render_item_done_list(lines, "보안/성능", gate.get("security_and_performance", []), phase_id=phase_id)
+        _render_item_done_list(lines, "문서화", gate.get("documentation", []), phase_id=phase_id)
+        _render_item_done_list(lines, "수동 검증", gate.get("manual_testing", []), phase_id=phase_id)
         _render_list(
             lines,
             "품질 게이트 검증 명령(예시)",
             [f"`{value}`" for value in gate.get("validation_commands", [])],
+            phase_id=phase_id,
         )
 
         _render_list(
             lines,
             "예시 테스트 명령",
             [f"`{value}`" for value in phase.get("test_commands", [])],
+            phase_id=phase_id,
         )
-        _render_list(lines, "예상 결과 예시", phase.get("result_examples", []))
+        _render_list(lines, "예상 결과 예시", phase.get("result_examples", []), phase_id=phase_id)
         if "notes" in phase:
-            _render_list(lines, "비고", phase.get("notes", []))
+            _render_list(lines, "비고", phase.get("notes", []), phase_id=phase_id)
 
-    lines.append("## 4. 의사결정 로그")
+    _append_heading(lines, "## 4. 의사결정 로그")
     decision_log = data["4_Decision_Log"]
     if not decision_log:
-        lines.append("- (없음)")
+        _append_bullet(lines, "(없음)")
     else:
         for item in decision_log:
-            lines.append(f"- **결정**: {item.get('decision', '')}")
-            lines.append(f"- **근거**: {item.get('reason', '')}")
-    lines.append("")
+            _append_bullet(lines, f"**결정**: {item.get('decision', '')}")
+            _append_bullet(lines, f"**근거**: {item.get('reason', '')}")
+    _finalize_block(lines)
 
-    lines.append("## 5. 검증 계획")
+    _append_heading(lines, "## 5. 검증 계획")
     for command in data["5_Validation"]:
-        lines.append(f"- {command}")
-    lines.append("")
+        _append_bullet(lines, command)
+    _finalize_block(lines)
 
-    lines.append("## 6. 리스크 평가")
+    _append_heading(lines, "## 6. 리스크 평가")
     risk_assessment = data["6_Risk_Assessment"]
     if risk_assessment:
         lines.append("| 리스크 | 확률 | 영향 | 완화 전략 |")
-        lines.append("|---|---|---|---|")
+        lines.append("| --- | --- | --- | --- |")
         for item in risk_assessment:
             lines.append(
                 f"| {item.get('risk', '')} | {item.get('probability', '')} | {item.get('impact', '')} | {item.get('mitigation_strategy', '')} |"
             )
     else:
         lines.append("- (없음)")
-    lines.append("")
+    _finalize_block(lines)
 
-    lines.append("## 7. 롤백 전략")
+    _append_heading(lines, "## 7. 롤백 전략")
     rollbacks = data["7_Rollback_Strategy"].get("phase_rollbacks", [])
     if rollbacks:
         for rollback in rollbacks:
-            lines.append(f"### Phase {rollback.get('phase_id', '')}")
-            lines.append(f"- **트리거**: {rollback.get('trigger', '')}")
-            lines.append(f"- **복구 목표**: {rollback.get('restore_target', '')}")
-            lines.append("- **롤백 단계**:")
+            _append_heading(lines, f"### Phase {rollback.get('phase_id', '')}")
+            _append_bullet(lines, f"**트리거**: {rollback.get('trigger', '')}")
+            _append_bullet(lines, f"**복구 목표**: {rollback.get('restore_target', '')}")
+            _append_bullet(lines, "**롤백 단계**:")
             for step in rollback.get("steps", []):
-                lines.append(f"- {step}")
-            lines.append("")
+                _append_bullet(lines, step)
+            _finalize_block(lines)
     else:
-        lines.append("- (없음)")
-        lines.append("")
+        _append_bullet(lines, "(없음)")
+        _finalize_block(lines)
 
-    lines.append("## 8. 진행률 추적")
+    _append_heading(lines, "## 8. 진행률 추적")
     tracking = data["8_Progress_Tracking"]
-    lines.append(f"- **overall_progress_percent**: {tracking.get('overall_progress_percent', 0)}%")
-    lines.append("")
-    lines.append("### Phase 상태")
+    _append_bullet(lines, f"**overall_progress_percent**: {tracking.get('overall_progress_percent', 0)}%")
+    _finalize_block(lines)
+    _append_heading(lines, "### Phase 상태")
     phase_status = tracking.get("phase_status", [])
     if phase_status:
         for item in phase_status:
-            lines.append(
-                f"- Phase {item.get('phase_id', '')}: status={item.get('status', '')}, progress={item.get('progress_percent', 0)}%"
+            _append_bullet(
+                lines,
+                f"Phase {item.get('phase_id', '')}: status={item.get('status', '')}, progress={item.get('progress_percent', 0)}%",
             )
     else:
-        lines.append("- (없음)")
-    lines.append("")
-    lines.append("### 시간 추적")
+        _append_bullet(lines, "(없음)")
+    _finalize_block(lines)
+    _append_heading(lines, "### 시간 추적")
     time_tracking = tracking.get("time_tracking", [])
     if time_tracking:
         lines.append("| Phase | Estimated | Actual | Variance |")
-        lines.append("|---|---:|---:|---:|")
+        lines.append("| --- | ---: | ---: | ---: |")
         for item in time_tracking:
             actual = "-" if item.get("actual_hours") is None else item.get("actual_hours")
             variance = "-" if item.get("variance_hours") is None else item.get("variance_hours")
@@ -529,17 +625,17 @@ def _render_markdown(data: dict[str, Any]) -> str:
                 f"| {item.get('phase_id', '')} | {item.get('estimated_hours', '')} | {actual} | {variance} |"
             )
     else:
-        lines.append("- (없음)")
-    lines.append("")
+        _append_bullet(lines, "(없음)")
+    _finalize_block(lines)
     _render_list(lines, "노트/학습", tracking.get("notes_and_learnings", []))
-    lines.append("### 블로커")
+    _append_heading(lines, "### 블로커")
     blockers = tracking.get("blockers", [])
     if blockers:
         for blocker in blockers:
-            lines.append(f"- **{blocker.get('title', '')}**: {blocker.get('resolution', '')}")
+            _append_bullet(lines, f"**{blocker.get('title', '')}**: {blocker.get('resolution', '')}")
     else:
-        lines.append("- (없음)")
-    lines.append("")
+        _append_bullet(lines, "(없음)")
+    _finalize_block(lines)
 
     return "\n".join(lines)
 

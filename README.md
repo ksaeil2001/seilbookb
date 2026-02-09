@@ -10,6 +10,17 @@
 - 문서 성격: **MVP 6주 미래 구현 로드맵**
 - 테스트 명령 정책: **예시 중심(`example_only`)**, 구현 단계에서 구체화
 
+## 문서 경로 맵
+
+- 핵심 운영 문서(루트 유지)
+  - `AGENTS.md`
+  - `README.md`
+  - `Plans.json`
+  - `Plans.md`
+  - `.markdownlint.json`
+- 사양 문서(`docs/specs`)
+  - `docs/specs/PRD.md`
+
 ### 로컬 작업 순서
 
 1. `Plans.json` 수정
@@ -22,6 +33,7 @@
 PR/Push에서 아래가 자동 실행됩니다.
 
 - `validate`: 스키마/필수 키/로드맵 메타데이터/체크리스트 단계(RED/GREEN/REFACTOR) 검증
+- `validate`: 문서 손상 패턴(`??`, `???`) 포함 여부 검증
 - `check`: `Plans.json`과 `Plans.md` 동기화 상태 검증
 
 동기화가 맞지 않으면 CI는 다음 메시지와 함께 실패합니다.
