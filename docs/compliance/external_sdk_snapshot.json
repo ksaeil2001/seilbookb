@@ -1,6 +1,6 @@
 {
   "watchlist_version": "2026-02-09",
-  "verified_at": "2026-02-09T15:01:38Z",
+  "verified_at": "2026-02-14T14:50:18Z",
   "items": [
     {
       "id": "google-sign-in-web",
@@ -11,7 +11,7 @@
       "content_type": "text/html; charset=utf-8",
       "hash": "18e91fc25076a7ea5a1fb9bf382f6c604e03adf1d87f7227afea0159a8dfe5f5",
       "text_length": 16178,
-      "fetched_at": "2026-02-09T15:01:37Z"
+      "fetched_at": "2026-02-14T14:50:18Z"
     },
     {
       "id": "tosspayments-v2-get-started",
@@ -22,7 +22,7 @@
       "content_type": "text/html; charset=utf-8",
       "hash": "5a1d6f97db192bb44d73d8ebad68bd9f8dca83c6b2a5d6761802ca6a60fc95b1",
       "text_length": 774,
-      "fetched_at": "2026-02-09T15:01:38Z"
+      "fetched_at": "2026-02-14T14:50:18Z"
     },
     {
       "id": "openai-developers-resources",
@@ -31,9 +31,9 @@
       "domain": "developers.openai.com",
       "status_code": 200,
       "content_type": "text/html; charset=utf-8",
-      "hash": "08b3969098b56bb66aa64e583b1d0acf0b187992f75a0a3a4e17e54cba883179",
-      "text_length": 4876,
-      "fetched_at": "2026-02-09T15:01:38Z"
+      "hash": "b7089934fb17aba1ced2af2112f737a5c07125e40682c50dab0721009d38a18a",
+      "text_length": 9849,
+      "fetched_at": "2026-02-14T14:50:18Z"
     }
   ]
 }
